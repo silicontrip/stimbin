@@ -5,7 +5,7 @@ import scipy.io.wavfile as wv
 import scipy.signal
 import argparse
 
-import matplotlib.pyplot as mpl
+#import matplotlib.pyplot as mpl
 
 #duration = 20.0
 freq=440
@@ -37,25 +37,30 @@ for fn in args.files:
 	caud = np.double(aud.transpose())
 	
 	#samples = int(fs*duration)
-	t = np.arange(samples) / ( sps * 1.0 )
+	# t = np.arange(samples) / ( sps * 1.0 )
 
 	# print t
 	#signal = scipy.signal.chirp(t, 50.0, t[-1], 1050.0)
 
 	#caud += 32768
-	t *= float(args.freq)
+	# t *= float(args.freq)
 	
-	scale = float(args.depth)
+	autoscmin = caud.min()
+	autoscmax = caud.max()
+	
+	scale = float(args.depth) / (autoscmax - autoscmin)
 	print "Scale", scale
-	# caud = -caud
+	caud -= autoscmin
 	caud *= scale
+	caud += float(args.freq)
 	
+	iaud = caud.cumsum() / (sps * 1.0)
 	
 	#for c in caud:
-	mpl.plot(caud)
-	mpl.show()	
+	#mpl.plot(caud)
+	#mpl.show()	
 	
-	signal =  np.sin(2 * np.pi * t + caud)  
+	signal =  np.sin(2 * np.pi *  iaud)  
 
 
 
