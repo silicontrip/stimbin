@@ -5,6 +5,7 @@ import scipy.io.wavfile as wv
 import scipy.signal
 import argparse
 
+import matplotlib.pyplot as mpl
 
 #duration = 20.0
 freq=440
@@ -13,7 +14,7 @@ freq=440
 parser = argparse.ArgumentParser(description='mod a wave signal.')
 parser.add_argument("files", nargs='+', help='wave files')
 parser.add_argument("-c", "--frequency", dest="freq", action="store", help="Centre Frequency Hz")
-parser.add_argument("-d", "--depth", dest="depth", action=store, help="modulation depth hz")
+parser.add_argument("-d", "--depth", dest="depth", action="store", help="modulation depth hz")
 args = parser.parse_args()
 
 for fn in args.files:
@@ -42,17 +43,26 @@ for fn in args.files:
 	#signal = scipy.signal.chirp(t, 50.0, t[-1], 1050.0)
 
 	#caud += 32768
-	scale = 32768.0 / float(args.depth)
-	caud /= scale
+	t *= float(args.freq)
 	
-	signal =  np.sin(2.0*np.pi * (float(args.freq) + caud) *t) 
+	scale = float(args.depth)
+	print "Scale", scale
+	# caud = -caud
+	caud *= scale
+	
+	
+	#for c in caud:
+	mpl.plot(caud)
+	mpl.show()	
+	
+	signal =  np.sin(2 * np.pi * t + caud)  
 
 
 
 #	print caud
-#	print signal
+	print signal.min() , signal.max()
 
-	signal *= caud
+	#signal *= caud
 
 	nfn = fn.replace(".wav","."+args.freq+".wav")
 	wv.write(nfn,sps,signal)
