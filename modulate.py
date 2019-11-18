@@ -50,17 +50,18 @@ for fn in args.files:
 		ad = np.double(a)
 
 		if (args.fm):
+			fd=np.array(ad)
 			autoscmin = ad.min()
 			autoscmax = ad.max()
 	
 			scale = float(args.depth) / (autoscmax - autoscmin)
 			print ("FM Scale", scale)
-			ad -= autoscmin
-			ad *= scale
-			ad = -ad  # lower frequencies are more intense
-			ad += float(args.freq)
+			fd -= autoscmin
+			fd *= scale
+			fd = -fd  # lower frequencies are more intense
+			fd += float(args.freq)
 
-			iaud = ad.cumsum() / (sps * 1.0)
+			iaud = fd.cumsum() / (sps * 1.0)
 			signal =  np.sin(2 * np.pi *  iaud) 
 		else:
 			# only AM modulationr; create a carrier
@@ -83,7 +84,7 @@ for fn in args.files:
 			mtype = "fm"
 	if (args.am):
 			mtype += "am"
-			
+
 	npaud = np.array(naud) 
 	nfn = fn.replace(".wav","."+mtype+"-"+args.freq+".wav")
 	wv.write(nfn,sps,npaud.transpose())
