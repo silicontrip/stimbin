@@ -14,6 +14,7 @@ parser.add_argument("files", nargs='+', help='wave files')
 parser.add_argument("-c", "--frequency", dest="freq", action="store", help="Carrier Frequency Hz")
 parser.add_argument("-a", "--am", dest="am", action='store_true', help="am modulation")
 parser.add_argument("-f", "--fm", dest="fm", action='store_true', help="fm modulation")
+parser.add_argument("-i","--invertfm",dest="invertfm", action="store_true", help="invert FM modulation")
 parser.add_argument("-d", "--depth", dest="depth", action="store", help="modulation depth hz")
 parser.add_argument("-C", "--channel", dest="channel", action='store', help="decode only channel C")
 
@@ -36,6 +37,13 @@ for fn in args.files:
 		
 	caud = aud.transpose()
 	
+	autoscmin = caud.min()
+	autoscmax = caud.max()
+	
+	# want a single scale for both channels
+	scale = float(args.depth) / (autoscmax - autoscmin)
+	print ("FM Scale", scale)
+
 	if chan == 1:
 		caud = np.array([caud])
 	
@@ -51,14 +59,17 @@ for fn in args.files:
 
 		if (args.fm):
 			fd=np.array(ad)
-			autoscmin = ad.min()
-			autoscmax = ad.max()
+
+			#autoscmin = ad.min()
+			#autoscmax = ad.max()
 	
-			scale = float(args.depth) / (autoscmax - autoscmin)
-			print ("FM Scale", scale)
+			# want a single scale for both channels
+			#scale = float(args.depth) / (autoscmax - autoscmin)
+			#print ("FM Scale", scale)
 			fd -= autoscmin
 			fd *= scale
-			fd = -fd  # lower frequencies are more intense
+			if (args.invertfm):
+				fd = -fd  # lower frequencies are more intense
 			fd += float(args.freq)
 
 			iaud = fd.cumsum() / (sps * 1.0)
