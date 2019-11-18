@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 
 import numpy as np
 import scipy.io.wavfile as wv
@@ -26,9 +26,9 @@ for fn in args.files:
 	else:
 		(samples,) = samples
 	
-	print "SPS: " + str(sps)
-	print "Channels: " + str(chan)
-	print "Samples: " + str(samples)
+	print ("SPS: " + str(sps))
+	print ("Channels: " + str(chan))
+	print ("Samples: " + str(samples))
 	
 	#print aud
 	
@@ -45,8 +45,8 @@ for fn in args.files:
 	caud += 32768
 	caud /= 32768
 
-	print caud
-	print signal
+	print (caud)
+	print (signal)
 
 	signal *= caud
 

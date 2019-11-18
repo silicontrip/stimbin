@@ -1,11 +1,9 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 
 import numpy as np
 import scipy.io.wavfile as wv
 import scipy.signal
 import argparse
-
-import matplotlib.pyplot as mpl
 
 #duration = 20.0
 freq=440
@@ -13,7 +11,9 @@ freq=440
 
 parser = argparse.ArgumentParser(description='mod a wave signal.')
 parser.add_argument("files", nargs='+', help='wave files')
-parser.add_argument("-c", "--frequency", dest="freq", action="store", help="Centre Frequency Hz")
+parser.add_argument("-c", "--frequency", dest="freq", action="store", help="Carrier Frequency Hz")
+parser.add_argument("-a", "--am", dest="am", action='store_true', help="am modulation")
+parser.add_argument("-f", "--fm", dest="fm", action='store_true', help="fm modulation")
 parser.add_argument("-d", "--depth", dest="depth", action="store", help="modulation depth hz")
 parser.add_argument("-C", "--channel", dest="channel", action='store', help="decode only channel C")
 
@@ -24,8 +24,6 @@ for fn in args.files:
 
 	samples=aud.shape
 
-	print (samples)
-
 	chan = 1
 	if (len(samples)>1):
 		(samples,chan) = samples
@@ -35,9 +33,7 @@ for fn in args.files:
 	print ("SPS: " + str(sps))
 	print ("Channels: " + str(chan))
 	print ("Samples: " + str(samples))
-	
-	#print aud
-	
+		
 	caud = aud.transpose()
 	
 	if chan == 1:
@@ -45,43 +41,43 @@ for fn in args.files:
 	
 	if (args.channel):
 		selchan = int(args.channel)
-		#print caud[selchan]
 		caud=np.array([caud[selchan]])
 	
 	#caud = np.double(aud.transpose())
 	naud = []
+
 	for a in caud:
-
 		ad = np.double(a)
-	
-		autoscmin = ad.min()
-		autoscmax = ad.max()
-	
-		scale = float(args.depth) / (autoscmax - autoscmin)
-		print ("Scale ", scale)
-		ad -= autoscmin
-		ad *= scale
-		ad = -ad 
-		ad += float(args.freq)
-		#ad = -caud  # because lower frequencies are more intense...
-	
-		iaud = ad.cumsum() / (sps * 1.0)
-	
-	#for c in caud:
-		#mpl.plot(ad)
-		#mpl.show()	
-	
-		signal =  np.sin(2 * np.pi *  iaud)  
 
-#	print caud
-		#print signal.min() , signal.max()
+		if (args.fm):
+			autoscmin = ad.min()
+			autoscmax = ad.max()
+	
+			scale = float(args.depth) / (autoscmax - autoscmin)
+			print ("FM Scale", scale)
+			ad -= autoscmin
+			ad *= scale
+			ad = -ad  # lower frequencies are more intense
+			ad += float(args.freq)
+
+			iaud = ad.cumsum() / (sps * 1.0)
+			signal =  np.sin(2 * np.pi *  iaud) 
+		else:
+			# only AM modulationr; create a carrier
+			t = np.arange(samples) / ( sps * 1.0 )
+			signal =  np.sin(2.0*np.pi * float(args.freq) *t)
+
+		if (args.am):
+			ad += 32768
+			ad /= 32768
+
+			#print (caud)
+			#print (signal)
+
+			signal *= ad
+
 		naud.append(signal)
-	#signal *= caud
 
 	npaud = np.array(naud) 
-	#print npaud.shape
-	#wavout=np.array(npaud.transpose(),dtype='int16')
-	#mpl.plot(naud)
-	#mpl.show()
 	nfn = fn.replace(".wav","."+args.freq+".wav")
 	wv.write(nfn,sps,npaud.transpose())

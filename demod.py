@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/local/bin/python3
 
 import sys
 import scipy.signal
@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser(description='demodulate a wave signal.')
 parser.add_argument("files", nargs='+', help='wave files')
 parser.add_argument("-a", "--am", dest="am", action='store_true', help="am demodulation")
 parser.add_argument("-f", "--fm", dest="fm", action='store_true', help="fm demodulation")
-parser.add_argument("-c", "--channel", dest="channel", action='store', help="decode only channel C")
+parser.add_argument("-C", "--channel", dest="channel", action='store', help="decode only channel C")
 parser.add_argument("-r","--pre", dest="prefilter",action="store", help="pre-filter signal")
 parser.add_argument("-p","--post", dest="postfilter",action="store", help="post-filter signal")
 
@@ -24,10 +24,10 @@ for fn in args.files:
 	chan = 1
 	if (len(samples)>1):
 		(samples,chan) = samples
-	
-	print "SPS: " + str(sps)
-	print "Channels: " + str(chan)
-	print "Samples: " + str(samples)
+
+	print("SPS: " + str(sps))
+	print("Channels: " + str(chan))
+	print("Samples: " + str(samples))
 	
 	nyq= sps / 2.0
 
@@ -48,12 +48,11 @@ for fn in args.files:
 	
 	naud=[]
 	for a in caud:
-	
-		print a
+		print (a)
 	
 		if (args.prefilter):
 			lh = args.prefilter.split("-")
-			print lh
+			print (lh)
 			low = int(lh[0]) / nyq
 			high = int(lh[1]) / nyq
 			bb, ba = scipy.signal.butter(6,[low,high], btype='band')
@@ -82,11 +81,11 @@ for fn in args.files:
 		#print str(sigfreq[sigfreq.__len__() / 2] ) + " Hz"
 	
 		#print min(sigmod) , max(sigmod)
-		print sig
+		print (sig)
 	
 		if (args.postfilter):
 			lh = args.postfilter.split("-")
-			print lh
+			print(lh)
 			low = float(lh[0]) / nyq
 			high = float(lh[1]) / nyq
 			cb, ca = scipy.signal.butter(3,[low,high], btype='band')
@@ -95,7 +94,7 @@ for fn in args.files:
 		naud.append(sig)
 
 	
-		print naud
+		print (naud)
 
 	ch=""
 	if (args.channel):
