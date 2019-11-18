@@ -78,6 +78,12 @@ for fn in args.files:
 
 		naud.append(signal)
 
+	mtype = ""
+	if (args.fm):
+			mtype = "fm"
+	if (args.am):
+			mtype += "am"
+			
 	npaud = np.array(naud) 
-	nfn = fn.replace(".wav","."+args.freq+".wav")
+	nfn = fn.replace(".wav","."+mtype+"-"+args.freq+".wav")
 	wv.write(nfn,sps,npaud.transpose())
