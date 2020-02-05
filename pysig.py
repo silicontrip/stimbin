@@ -11,6 +11,7 @@ def DB(db):
 
 def write(signalleft,right=None,sps=44100,name="out.wav"):
 	dur = signalleft.duration()
+	print("Duration:" + str(dur) + " sps: " + str(sps) )
 	sample=numpy.arange(0,dur,1/sps)
 	sleft = signalleft.getsample(sample)
 	if right is not None:
@@ -247,8 +248,8 @@ class Bipolar(Sine):
 		
 		#,])
 
-		numpy.piecewise([x<0,x>=0],[1,0])		
-		numpy.piecewise([x<0,x>=0],[0,-1])		
+		#numpy.piecewise([x<0,x>=0],[1,0])		
+		#numpy.piecewise([x<0,x>=0],[0,-1])		
 
 		# scipy.signal.square()
 
@@ -280,25 +281,35 @@ class Square(Sine):
 	duty=0.5
 
 	def __init__(self,h,amplitude=None,phase=None,duty=None,duration=None):
+		dur = math.inf
 		if amplitude is None:
 			self.amplitude = DC(DB(0))
 		else:
 			self.amplitude = signal(amplitude)
 
+		dur = min(self.amplitude.duration(),dur)
+
 		self.hertz = signal(h)
+
+		dur = min(self.hertz.duration(),dur)
+
 
 		if phase is None:
 			self.phase = DC(0)
 		else:
 			self.phase = signal(phase)
 
+		dur = min(self.phase.duration(),dur)
+
 		if duty is None:
 			self.duty = DC(0.5)
 		else:
 			self.duty = signal(duty)
 
+		dur = min(self.duty.duration(),dur)
+
 		if duration is None:
-			self.dur = math.inf
+			self.dur = dur
 		else:
 			self.dur = duration
 
@@ -406,7 +417,7 @@ class Mplex(SignalGenerator):
 class Wave(SignalGenerator):
 	samples = 0
 	sps = 1
-	audio = {}
+	audio = numpy.ndarray([])
 	periodic=False
 
 	def __init__(self,name,channel=0,periodic=False,duration=None):
@@ -416,8 +427,8 @@ class Wave(SignalGenerator):
 		self.periodic=periodic
 
 		chan = 1
-		if (len(samples)>1):
-			(self.samples,chan) = samples
+		if (len(self.samples)>1):
+			(self.samples,chan) = self.samples
 
 		# override sample rate to get desired duration.
 		if duration is not None:
@@ -426,19 +437,29 @@ class Wave(SignalGenerator):
 		caud = aud.transpose()
 
 		if chan == 1:
-			self.audio = numpy.array([caud])
+			self.audio = numpy.array(caud) / 32767.0
 		else:
-			self.audio=numpy.array([caud[channel]])
+			self.audio=numpy.array(caud[channel]) / 32767.0
+
+		#print (self.audio)
 
 	def duration(self):
 		return 1.0 * self.samples / self.sps
 
 	def getsample (self,time):
 			
-		spos = numpy.round(self.sps * time)
+		spos = numpy.round(self.sps * time).astype(int)
+
 		if (self.periodic):
 			spos = spos % self.samples
-		numpy.piecewise([spos<=self.samples,spos>self.samples],[self.audio[spos],0])
+
+		#print(spos.shape)
+		#print(self.audio.size)
+		#print(self.audio.shape)
+
+		#return self.audio[spos]
+		return numpy.where (spos<=self.samples,self.audio[spos],0)
+		#return numpy.piecewise(spos,[spos<=self.samples],[lambda spos: self.audio[spos],0])
 
 #class Dur(SignalGenerator):
 #	sig={}
