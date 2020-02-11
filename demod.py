@@ -3,7 +3,10 @@
 import sys
 import scipy.signal
 import scipy.io.wavfile
+import scipy.fftpack
 import numpy
+import librosa as lr
+
 import argparse
 
 parser = argparse.ArgumentParser(description='demodulate a wave signal.')
@@ -17,7 +20,8 @@ parser.add_argument("-p","--post", dest="postfilter",action="store", help="post-
 args = parser.parse_args()
 
 for fn in args.files:
-	sps,aud = scipy.io.wavfile.read(fn)
+	aud, sps= lr.load(fn)
+	#sps,aud = scipy.io.wavfile.read(fn)
 	
 	samples=aud.shape
 	
@@ -47,6 +51,7 @@ for fn in args.files:
 	# print caud
 	
 	naud=[]
+	invert=False
 	for a in caud:
 		print (a)
 	
@@ -64,8 +69,12 @@ for fn in args.files:
 		# am
 		#print "abs"
 		if (args.am):
-			sig = numpy.abs(sigcmplx) - 32768.0
+			if invert:
+				sig = 65536 - numpy.abs(sigcmplx)
+			else:
+				sig = numpy.abs(sigcmplx) - 32768.0
 			#naud.append(sigmod)
+			invert=True
 		
 		# fm
 	# calculate carrier frequency
