@@ -38,9 +38,9 @@ for fn in args.files:
 	
 		#print a
 	
-	#print "hilbert"
+		#print "hilbert"
 		sigcmplx = scipy.signal.hilbert(a)
-		naud.append(sigcmplx.real)
+		#naud.append(sigcmplx.real)
 		naud.append(sigcmplx.imag)
 
 		print (naud)

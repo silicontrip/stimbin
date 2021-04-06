@@ -1,3 +1,9 @@
 *.wav
 *.pkf
 *.jar
+*.mp3
+*.zip
+*.png
+.vscode
+__pycache__
+*.txt
