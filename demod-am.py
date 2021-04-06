@@ -49,7 +49,7 @@ for fn in args.files:
 		# am
 		#print "abs"
 		if (args.am):
-			sigmod = numpy.abs(sigcmplx) - 32768.0
+			sigmod = numpy.abs(sigcmplx)
 			naud.append(sigmod)
 
 		
