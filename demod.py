@@ -5,7 +5,6 @@ import scipy.signal
 import scipy.io.wavfile
 import scipy.fftpack
 import numpy
-import librosa as lr
 
 import argparse
 
@@ -20,8 +19,9 @@ parser.add_argument("-p","--post", dest="postfilter",action="store", help="post-
 args = parser.parse_args()
 
 for fn in args.files:
-	aud, sps= lr.load(fn)
-	#sps,aud = scipy.io.wavfile.read(fn)
+	# aud, sps= lr.load(fn) # this resamples to 22,050 and single channel
+	# unless overridden, I want to preserve sps and channels.
+	sps,aud = scipy.io.wavfile.read(fn)
 	
 	samples=aud.shape
 	
@@ -60,23 +60,26 @@ for fn in args.files:
 			print (lh)
 			low = int(lh[0]) / nyq
 			high = int(lh[1]) / nyq
-			bb, ba = scipy.signal.butter(6,[low,high], btype='band')
+			bb, ba = scipy.signal.butter(10,[low,high], btype='band')
 			a = scipy.signal.lfilter(bb,ba,a)
 			
+
+			print(a)
+		print("hilbert")
 	#print "hilbert"
 		sigcmplx = scipy.signal.hilbert(a)
-		
+		print(sigcmplx)
 		# am
-		#print "abs"
+		print("am")
 		if (args.am):
 			if invert:
-				sig = 65536 - numpy.abs(sigcmplx)
+				sig = - numpy.abs(sigcmplx)
 			else:
-				sig = numpy.abs(sigcmplx) - 32768.0
-			#naud.append(sigmod)
+				sig = numpy.abs(sigcmplx) 
+				#naud.append(sigmod)
 			invert=True
 		
-		# fm
+		print("fm")
 	# calculate carrier frequency
 		if (args.fm):
 			scale = 32768.0 / numpy.pi
@@ -110,12 +113,19 @@ for fn in args.files:
 			ch=str(args.channel)
 
 	nfn=""	
+	stna = fn.split('.')
+	# blindly slice off the last 4 characters
 	if (args.fm):
-		nfn = fn.replace(".wav",".fm"+ch+".wav")
+		stna[-1] = "dfm"+ch+".wav"
+		nfn = ".".join(stna)
 	if (args.am):
-		nfn = fn.replace(".wav",".am"+ch+".wav")
+		stna[-1] = "dam"+ch+".wav"
+		nfn = ".".join(stna)
+
+
 	
 	if (nfn):
+		print("Writing " + nfn + "...")
 		npaud = numpy.array(naud)
 		wavout=numpy.array(npaud.transpose(),dtype='int16')
 		scipy.io.wavfile.write(nfn, sps, wavout)
