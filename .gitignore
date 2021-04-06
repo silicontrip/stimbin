@@ -2,8 +2,13 @@
 *.pkf
 *.jar
 *.mp3
+*.m4a
+*.flac
 *.zip
 *.png
 .vscode
 __pycache__
 *.txt
+.DS_Store
+.swp
+Software
