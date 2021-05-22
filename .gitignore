@@ -1,0 +1,15 @@
+*.flac
+*.jar
+*.log
+*.m4a
+*.mp3
+*.pkf
+*.png
+*.txt
+*.wav
+*.zip
+.DS_Store
+.swp
+.vscode
+Software
+__pycache__

@@ -20,7 +20,11 @@ def write(signalleft,right=None,sps=44100,name="out.wav"):
 	
 	print("Duration:" + str(dur) + " sps: " + str(sps) )
 #	sample=numpy.arange(0,dur,1/sps)
+<<<<<<< HEAD
 	sample=numpy.linspace(0,dur,num=int(sps * dur))
+=======
+	sample=numpy.linspace(0,dur,num=sps * dur)
+>>>>>>> c2ed75a8440e3f98753a7ef7f37ebb0b720606c0
 	sleft = signalleft.getsample(sample)
 	if right is not None:
 		sright = right.getsample(sample)
@@ -421,6 +425,7 @@ class Sawtooth(Sine):
 	hertz = 0
 	phase = 0
 	dur = 0
+<<<<<<< HEAD
 	duty = 0
 
 	def __init__(self,h,amplitude=None,phase=None,duration=None,duty=None):
@@ -445,20 +450,29 @@ class Sawtooth(Sine):
 		else:
 			self.duty = duty * numpy.pi / 50
 			# self.duty = signal(duty * numpy.pi / 100 )
+=======
+>>>>>>> c2ed75a8440e3f98753a7ef7f37ebb0b720606c0
 
 	def getsample(self,time):
 		hza = self.hertz.getsample(time)
 		pha = self.phase.getsample(time)
+<<<<<<< HEAD
 		dut = self.duty
+=======
+>>>>>>> c2ed75a8440e3f98753a7ef7f37ebb0b720606c0
 
 		timea = scipy.integrate.cumtrapz(hza,time,initial=0)
 
 		timea = timea * 2 * math.pi
 		timea = timea + pha
 		# need to do pwm
+<<<<<<< HEAD
 		return self.amplitude.getsample(timea) * numpy.interp(timea,[0,dut,2*numpy.pi],[1,-1,1],period=2*numpy.pi)
 
 		#return self.amplitude.getsample(timea) * numpy.interp(timea,[0,2*numpy.pi],[1,-1],period=2*numpy.pi)
+=======
+		return self.amplitude.getsample(timea) * numpy.interp(timea,[0,2*numpy.pi],[1,-1],period=2*numpy.pi)
+>>>>>>> c2ed75a8440e3f98753a7ef7f37ebb0b720606c0
 
 class Square(Sine):
 	amplitude = 0
